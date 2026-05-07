@@ -1,0 +1,440 @@
+<?php
+/**
+ * HawkCell promotional banner
+ *
+ * Banner displayed directly under the main header line.
+ *
+ * @package Hawkcell
+ */
+
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+/**
+ * Banner expiration.
+ * The banner will stop showing on June 1, 2026 at 08:59 France time.
+ */
+$banner_expires_at = '2026-06-01 08:59:00';
+$banner_timezone   = new DateTimeZone( 'Europe/Paris' );
+$banner_now        = new DateTimeImmutable( 'now', $banner_timezone );
+$banner_expiry     = new DateTimeImmutable( $banner_expires_at, $banner_timezone );
+
+if ( $banner_now >= $banner_expiry ) {
+	return;
+}
+
+$current_locale = function_exists( 'determine_locale' ) ? determine_locale() : get_locale();
+$current_path   = isset( $_SERVER['REQUEST_URI'] ) ? sanitize_text_field( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : '';
+
+$is_french_version = strpos( $current_locale, 'fr' ) === 0 || strpos( $current_path, '/fr/' ) === 0;
+
+$button_text = $is_french_version ? "J'en Profite" : 'REDEEM NOW';
+
+$validity_text = $is_french_version
+	? 'Offre valable jusqu’au 31 mai 2026'
+	: 'Offer valid until May 31, 2026';
+
+$banner_text = $is_french_version
+	? 'Obtenez <strong>20 %</strong> de réduction en appliquant le code promo "<strong>HAWKSPINE20</strong>" lors du paiement de votre HawkSpine'
+	: 'Get <strong>20%</strong> off by applying the promo code "<strong>HAWKSPINE20</strong>" at checkout on your HawkSpine';
+
+$banner_text_mobile = $is_french_version
+	? '<strong>20 %</strong> de réduction avec le code "<strong>HAWKSPINE20</strong>" sur HawkSpine'
+	: '<strong>20%</strong> off HawkSpine with code "<strong>HAWKSPINE20</strong>"';
+
+/**
+ * Button URL by language version.
+ */
+$button_url = $is_french_version
+	? 'https://hawkspine.hawkcell.com/stripefr'
+	: 'https://hawkspine.hawkcell.com/stripe';
+
+$banner_classes = 'hawkcell-promo-banner' . ( $is_french_version ? ' hawkcell-promo-banner--fr' : '' );
+?>
+
+<div id="hawkcell-promo-banner" class="<?php echo esc_attr( $banner_classes ); ?>">
+	<div class="hawkcell-promo-banner__inner">
+		<div class="hawkcell-promo-banner__text">
+			<span class="hawkcell-promo-banner__text-desktop">
+				<?php echo wp_kses( $banner_text, array( 'strong' => array() ) ); ?>
+			</span>
+
+			<span class="hawkcell-promo-banner__text-mobile">
+				<?php echo wp_kses( $banner_text_mobile, array( 'strong' => array() ) ); ?>
+			</span>
+		</div>
+
+		<div class="hawkcell-promo-banner__actions">
+			<a class="hawkcell-promo-banner__button" href="<?php echo esc_url( $button_url ); ?>">
+				<?php echo esc_html( $button_text ); ?>
+			</a>
+
+			<div class="hawkcell-promo-banner__validity">
+				<?php echo esc_html( $validity_text ); ?>
+			</div>
+		</div>
+	</div>
+</div>
+
+<style>
+	#hawkcell-promo-banner {
+		position: fixed;
+
+		/*
+		 * HERO POSITION:
+		 * This is the banner position on the hero section / black header.
+		 * Increase the value to lower the banner.
+		 * Decrease the value to raise the banner.
+		 */
+		top: 117px;
+
+		left: 0;
+		right: 0;
+
+		/*
+		 * Lower than the header z-20, so dropdown menus appear in front.
+		 */
+		z-index: 19;
+
+		width: 100%;
+		background: #0099FF;
+		color: #ffffff;
+		box-shadow: none;
+		border: none;
+		opacity: 1;
+		transform: translateY(0);
+		pointer-events: auto;
+		transition: top 0.25s ease;
+	}
+
+	/*
+	 * SCROLLED POSITION:
+	 * This is the banner position after the user scrolls into the white header sections.
+	 * Increase the value to lower the banner.
+	 * Decrease the value to raise the banner.
+	 */
+	#hawkcell-promo-banner.hawkcell-promo-banner--scrolled {
+		top: 89px;
+	}
+
+	.hawkcell-promo-banner__inner {
+		max-width: 1200px;
+		margin: 0 auto;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 2rem;
+		padding: 0.45rem 24px;
+		min-height: 44px;
+	}
+
+	.hawkcell-promo-banner__text {
+		color: #ffffff;
+		font-family: 'Mont', 'Inter', 'Rubik', sans-serif;
+		font-size: 0.95rem;
+		font-weight: 400;
+		line-height: 1.2;
+		letter-spacing: -0.01em;
+		text-align: center;
+	}
+
+	.hawkcell-promo-banner__text strong {
+		font-weight: 700;
+	}
+
+	.hawkcell-promo-banner__text-mobile {
+		display: none;
+	}
+
+	.hawkcell-promo-banner--fr .hawkcell-promo-banner__inner {
+		gap: 1.35rem;
+	}
+
+	.hawkcell-promo-banner--fr .hawkcell-promo-banner__text {
+		font-size: 0.84rem;
+		white-space: nowrap;
+		flex-shrink: 0;
+		max-width: none;
+	}
+
+	.hawkcell-promo-banner__actions {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		gap: 0.8rem;
+		white-space: nowrap;
+	}
+
+	.hawkcell-promo-banner__button {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		text-align: center;
+		position: relative;
+		top: 1px;
+		background: #ffffff;
+		color: #0099FF;
+		font-family: 'Mont', 'Inter', 'Rubik', sans-serif;
+		font-size: 0.9rem;
+		font-weight: 700;
+		line-height: normal;
+		border-radius: 7px;
+		border: 1.5px solid #ffffff;
+		padding: 0.55rem 1.15rem;
+		text-decoration: none;
+		white-space: nowrap;
+		cursor: pointer;
+		box-shadow: none;
+		text-transform: uppercase;
+		transition:
+			background 0.18s ease,
+			color 0.18s ease,
+			border 0.18s ease,
+			transform 0.18s ease,
+			box-shadow 0.18s ease;
+	}
+
+	.hawkcell-promo-banner__button:hover,
+	.hawkcell-promo-banner__button:focus {
+		background: #ffffff;
+		color: #0099FF;
+		border-color: #ffffff;
+		box-shadow: 0 4px 18px rgba(255, 255, 255, 0.28);
+		text-decoration: none;
+		outline: none;
+	}
+
+	.hawkcell-promo-banner__button:hover {
+		transform: translateY(-1px);
+	}
+
+	.hawkcell-promo-banner__validity {
+		color: #ffffff;
+		font-family: 'Mont', 'Inter', 'Rubik', sans-serif;
+		font-size: 0.72rem;
+		font-weight: 400;
+		font-style: italic;
+		line-height: 1.2;
+		letter-spacing: -0.01em;
+		white-space: nowrap;
+	}
+
+	@media (max-width: 1024px) {
+		#hawkcell-promo-banner {
+			top: 84px;
+		}
+
+		#hawkcell-promo-banner.hawkcell-promo-banner--scrolled {
+			top: 72px;
+		}
+
+		.hawkcell-promo-banner__inner {
+			min-height: 42px;
+			padding: 0.42rem 20px;
+		}
+
+		.hawkcell-promo-banner__text {
+			font-size: 0.88rem;
+		}
+
+		.hawkcell-promo-banner--fr .hawkcell-promo-banner__text {
+			font-size: 0.8rem;
+			white-space: nowrap;
+			flex-shrink: 0;
+			max-width: none;
+		}
+
+		.hawkcell-promo-banner__button {
+			font-size: 0.82rem;
+			padding: 0.5rem 1rem;
+		}
+
+		.hawkcell-promo-banner__validity {
+			font-size: 0.68rem;
+		}
+	}
+
+	@media (max-width: 768px) {
+		#hawkcell-promo-banner {
+			top: 80px;
+		}
+
+		#hawkcell-promo-banner.hawkcell-promo-banner--scrolled {
+			top: 68px;
+		}
+
+		.hawkcell-promo-banner__inner {
+			gap: 0.85rem;
+			padding: 0.45rem 16px;
+			min-height: 40px;
+		}
+
+		.hawkcell-promo-banner__text {
+			font-size: 0.78rem;
+			line-height: 1.25;
+		}
+
+		.hawkcell-promo-banner--fr .hawkcell-promo-banner__text {
+			font-size: 0.78rem;
+			white-space: nowrap;
+			flex-shrink: 0;
+			max-width: none;
+		}
+
+		.hawkcell-promo-banner__button {
+			font-size: 0.76rem;
+			padding: 0.48rem 0.85rem;
+		}
+
+		.hawkcell-promo-banner__actions {
+			gap: 0.55rem;
+		}
+
+		.hawkcell-promo-banner__validity {
+			font-size: 0.62rem;
+		}
+	}
+
+	@media (max-width: 520px) {
+		#hawkcell-promo-banner {
+			/*
+			 * MOBILE HERO POSITION:
+			 * Increase this value to lower the banner only on the hero section.
+			 * Decrease this value to raise it.
+			 */
+			top: 104px;
+		}
+
+		#hawkcell-promo-banner.hawkcell-promo-banner--scrolled {
+			/*
+			 * MOBILE SCROLLED POSITION:
+			 * This keeps the banner position on the other sections/pages.
+			 */
+			top: 70px;
+		}
+		
+		#hawkcell-promo-banner.hawkcell-promo-banner--scrolled {
+	        /*
+	         * MOBILE SCROLLED POSITION / OTHER SECTIONS:
+	         * Increase this value slightly to lower the banner on other pages/sections.
+	         */
+	        top: 72px;
+        }
+
+		.hawkcell-promo-banner__inner,
+		.hawkcell-promo-banner--fr .hawkcell-promo-banner__inner {
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			gap: 0.28rem;
+			width: 100%;
+			max-width: 100%;
+			padding: 0.42rem 12px 0.46rem;
+			min-height: auto;
+			box-sizing: border-box;
+		}
+
+		.hawkcell-promo-banner__text,
+		.hawkcell-promo-banner--fr .hawkcell-promo-banner__text {
+			width: 100%;
+			max-width: 100%;
+			font-size: 0.7rem;
+			line-height: 1.1;
+			text-align: center;
+			white-space: nowrap;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			flex-shrink: 1;
+			box-sizing: border-box;
+		}
+
+		.hawkcell-promo-banner__text-desktop {
+			display: none;
+		}
+
+		.hawkcell-promo-banner__text-mobile {
+			display: inline;
+		}
+
+		.hawkcell-promo-banner__actions {
+			width: auto;
+			flex-direction: row;
+			align-items: center;
+			justify-content: center;
+			gap: 0.5rem;
+			white-space: nowrap;
+		}
+
+		.hawkcell-promo-banner__button {
+			top: 0;
+			font-size: 0.68rem;
+			padding: 0.4rem 0.85rem;
+			margin: 0;
+			border-radius: 7px;
+		}
+
+		.hawkcell-promo-banner__validity {
+			font-size: 0.54rem;
+			line-height: 1.1;
+			text-align: left;
+			white-space: nowrap;
+		}
+	}
+
+	@media (max-width: 380px) {
+		.hawkcell-promo-banner__inner,
+		.hawkcell-promo-banner--fr .hawkcell-promo-banner__inner {
+			padding-left: 8px;
+			padding-right: 8px;
+			gap: 0.24rem;
+		}
+
+		.hawkcell-promo-banner__text,
+		.hawkcell-promo-banner--fr .hawkcell-promo-banner__text {
+			font-size: 0.62rem;
+		}
+
+		.hawkcell-promo-banner__actions {
+			gap: 0.38rem;
+		}
+
+		.hawkcell-promo-banner__button {
+			font-size: 0.62rem;
+			padding: 0.36rem 0.7rem;
+		}
+
+		.hawkcell-promo-banner__validity {
+			font-size: 0.48rem;
+		}
+	}
+</style>
+
+<script>
+	document.addEventListener('DOMContentLoaded', function () {
+		var banner = document.getElementById('hawkcell-promo-banner');
+
+		if (!banner) {
+			return;
+		}
+
+		/*
+		 * Adjust this value if needed.
+		 * When the user scrolls more than this number of pixels,
+		 * the banner switches to the "scrolled" position.
+		 */
+		var scrollTrigger = 80;
+
+		function updateBannerPosition() {
+			if (window.scrollY > scrollTrigger) {
+				banner.classList.add('hawkcell-promo-banner--scrolled');
+			} else {
+				banner.classList.remove('hawkcell-promo-banner--scrolled');
+			}
+		}
+
+		updateBannerPosition();
+
+		window.addEventListener('scroll', updateBannerPosition, { passive: true });
+	});
+</script>
