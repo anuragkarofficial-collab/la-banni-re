@@ -109,6 +109,29 @@ $banner_classes = 'hawkcell-promo-banner' . ( $is_french_version ? ' hawkcell-pr
 	}
 
 	/*
+	 * DESKTOP HERO / SLIDER OFFSET ONLY:
+	 * This lowers only the home hero slider block so the comparison line
+	 * no longer crosses the fixed promo banner on large screens.
+	 * Header and banner remain unchanged.
+	 */
+	@media (min-width: 769px) {
+		.hc-home-hero-v2[data-home-hero-v2] {
+			padding-top: 150px !important;
+		}
+	}
+	
+	/*
+     * LARGE SCREEN HERO / SLIDER OFFSET:
+     * Extra lowering only on very large screens, where the slider line can still
+     * reach the promo banner.
+     */
+    @media (min-width: 1600px) {
+	    .hc-home-hero-v2[data-home-hero-v2] {
+		    padding-top: 180px !important;
+	    }
+    }
+
+	/*
 	 * FRENCH HERO POSITION:
 	 * This lowers only the French version of the banner.
 	 * English remains unchanged at 117px.
@@ -116,6 +139,17 @@ $banner_classes = 'hawkcell-promo-banner' . ( $is_french_version ? ' hawkcell-pr
 	#hawkcell-promo-banner.hawkcell-promo-banner--fr {
 		top: 122px;
 	}
+	
+	/*
+     * FRENCH LARGE SCREEN ONLY:
+     * Removes the small gap between the header line and the blue banner
+     * only on large desktop screens.
+     */
+     @media (min-width: 1600px) {
+	     #hawkcell-promo-banner.hawkcell-promo-banner--fr {
+		     top: 117px;
+	     }
+     }
 
 	/*
 	 * SCROLLED POSITION:
@@ -326,19 +360,11 @@ $banner_classes = 'hawkcell-promo-banner' . ( $is_french_version ? ' hawkcell-pr
 
 		#hawkcell-promo-banner.hawkcell-promo-banner--scrolled {
 			/*
-			 * MOBILE SCROLLED POSITION:
-			 * This keeps the banner position on the other sections/pages.
+			 * MOBILE SCROLLED POSITION / OTHER SECTIONS:
+			 * Increase this value slightly to lower the banner on other pages/sections.
 			 */
-			top: 70px;
+			top: 72px;
 		}
-		
-		#hawkcell-promo-banner.hawkcell-promo-banner--scrolled {
-	        /*
-	         * MOBILE SCROLLED POSITION / OTHER SECTIONS:
-	         * Increase this value slightly to lower the banner on other pages/sections.
-	         */
-	        top: 72px;
-        }
 
 		.hawkcell-promo-banner__inner,
 		.hawkcell-promo-banner--fr .hawkcell-promo-banner__inner {
